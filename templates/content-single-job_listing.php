@@ -1,36 +1,50 @@
-<div class="single_job_listing" itemscope itemtype="http://schema.org/JobPosting">
-	<meta itemprop="title" content="<?php echo esc_attr( $post->post_title ); ?>" />
+<?php
+/**
+ * Single job listing.
+ *
+ * This template can be overridden by copying it to yourtheme/job_manager/content-single-job_listing.php.
+ *
+ * @see         https://wpjobmanager.com/document/template-overrides/
+ * @author      Automattic
+ * @package     WP Job Manager
+ * @category    Template
+ * @since       1.0.0
+ * @version     1.28.0
+ */
 
-	<?php if ( $post->post_status == 'expired' ) : ?>
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
-		<div class="job-manager-info"><?php _e( 'This listing has expired', 'wp-job-manager' ); ?></div>
-
+global $post;
+?>
+<div class="single_job_listing">
+	<?php if ( get_option( 'job_manager_hide_expired_content', 1 ) && 'expired' === $post->post_status ) : ?>
+		<div class="job-manager-info"><?php _e( 'This listing has expired.', 'wp-job-manager' ); ?></div>
 	<?php else : ?>
-
-		<?php 
+		<?php
 			/**
 			 * single_job_listing_start hook
 			 *
 			 * @hooked job_listing_meta_display - 20
 			 * @hooked job_listing_company_display - 30
 			 */
-			do_action( 'single_job_listing_start' ); 
+			do_action( 'single_job_listing_start' );
 		?>
 
-		<div class="job_description" itemprop="description">
-			<?php echo apply_filters( 'the_job_description', get_the_content() ); ?>
+		<div class="job_description">
+			<?php wpjm_the_job_description(); ?>
 		</div>
 
-		<?php if ( ! is_position_filled() && $post->post_status !== 'preview' ) : ?>
+		<?php if ( candidates_can_apply() ) : ?>
 			<?php get_job_manager_template( 'job-application.php' ); ?>
 		<?php endif; ?>
 
-		<?php 
+		<?php
 			/**
 			 * single_job_listing_end hook
 			 */
-			do_action( 'single_job_listing_end' ); 
+			do_action( 'single_job_listing_end' );
 		?>
-
 	<?php endif; ?>
 </div>

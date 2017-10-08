@@ -1,6 +1,24 @@
-<?php wp_enqueue_script( 'wp-job-manager-ajax-filters' ); ?>
+<?php
+/**
+ * Filters in `[jobs]` shortcode.
+ *
+ * This template can be overridden by copying it to yourtheme/job_manager/job-filters.php.
+ *
+ * @see         https://wpjobmanager.com/document/template-overrides/
+ * @author      Automattic
+ * @package     WP Job Manager
+ * @category    Template
+ * @version     1.21.0
+ */
 
-<?php do_action( 'job_manager_job_filters_before', $atts ); ?>
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+wp_enqueue_script( 'wp-job-manager-ajax-filters' );
+
+do_action( 'job_manager_job_filters_before', $atts );
+?>
 
 <form class="job_filters">
 	<?php do_action( 'job_manager_job_filters_start', $atts ); ?>
@@ -27,8 +45,8 @@
 				<label for="search_categories"><?php _e( 'Category', 'wp-job-manager' ); ?></label>
 				<?php if ( $show_category_multiselect ) : ?>
 					<?php job_manager_dropdown_categories( array( 'taxonomy' => 'job_listing_category', 'hierarchical' => 1, 'name' => 'search_categories', 'orderby' => 'name', 'selected' => $selected_category, 'hide_empty' => false ) ); ?>
-				<?php else : ?>	
-					<?php wp_dropdown_categories( array( 'taxonomy' => 'job_listing_category', 'hierarchical' => 1, 'show_option_all' => __( 'Any category', 'wp-job-manager' ), 'name' => 'search_categories', 'orderby' => 'name', 'selected' => $selected_category ) ); ?>
+				<?php else : ?>
+					<?php job_manager_dropdown_categories( array( 'taxonomy' => 'job_listing_category', 'hierarchical' => 1, 'show_option_all' => __( 'Any category', 'wp-job-manager' ), 'name' => 'search_categories', 'orderby' => 'name', 'selected' => $selected_category, 'multiple' => false ) ); ?>
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>

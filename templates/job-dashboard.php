@@ -1,5 +1,22 @@
+<?php
+/**
+ * Job dashboard shortcode content.
+ *
+ * This template can be overridden by copying it to yourtheme/job_manager/job-dashboard.php.
+ *
+ * @see         https://wpjobmanager.com/document/template-overrides/
+ * @author      Automattic
+ * @package     WP Job Manager
+ * @category    Template
+ * @version     1.27.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+?>
 <div id="job-manager-job-dashboard">
-	<p><?php _e( 'Your listings are shown in the table below. Expired listings will be automatically removed after 30 days.', 'wp-job-manager' ); ?></p>
+	<p><?php _e( 'Your listings are shown in the table below.', 'wp-job-manager' ); ?></p>
 	<table class="job-manager-jobs">
 		<thead>
 			<tr>
@@ -20,9 +37,9 @@
 							<td class="<?php echo esc_attr( $key ); ?>">
 								<?php if ('job_title' === $key ) : ?>
 									<?php if ( $job->post_status == 'publish' ) : ?>
-										<a href="<?php echo get_permalink( $job->ID ); ?>"><?php echo $job->post_title; ?></a>
+										<a href="<?php echo get_permalink( $job->ID ); ?>"><?php wpjm_the_job_title( $job ); ?></a>
 									<?php else : ?>
-										<?php echo $job->post_title; ?> <small>(<?php the_job_status( $job ); ?>)</small>
+										<?php wpjm_the_job_title( $job ); ?> <small>(<?php the_job_status( $job ); ?>)</small>
 									<?php endif; ?>
 									<ul class="job-dashboard-actions">
 										<?php
@@ -37,12 +54,20 @@
 													} else {
 														$actions['mark_filled'] = array( 'label' => __( 'Mark filled', 'wp-job-manager' ), 'nonce' => true );
 													}
+
+													$actions['duplicate'] = array( 'label' => __( 'Duplicate', 'wp-job-manager' ), 'nonce' => true );
 													break;
 												case 'expired' :
 													if ( job_manager_get_permalink( 'submit_job_form' ) ) {
 														$actions['relist'] = array( 'label' => __( 'Relist', 'wp-job-manager' ), 'nonce' => true );
 													}
 													break;
+												case 'pending_payment' :
+												case 'pending' :
+													if ( job_manager_user_can_edit_pending_submissions() ) {
+														$actions['edit'] = array( 'label' => __( 'Edit', 'wp-job-manager' ), 'nonce' => false );
+													}
+												break;
 											}
 
 											$actions['delete'] = array( 'label' => __( 'Delete', 'wp-job-manager' ), 'nonce' => true );
@@ -53,7 +78,7 @@
 												if ( $value['nonce'] ) {
 													$action_url = wp_nonce_url( $action_url, 'job_manager_my_job_actions' );
 												}
-												echo '<li><a href="' . $action_url . '" class="job-dashboard-action-' . $action . '">' . $value['label'] . '</a></li>';
+												echo '<li><a href="' . esc_url( $action_url ) . '" class="job-dashboard-action-' . esc_attr( $action ) . '">' . esc_html( $value['label'] ) . '</a></li>';
 											}
 										?>
 									</ul>

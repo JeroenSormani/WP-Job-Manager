@@ -1,4 +1,19 @@
-<?php 
+<?php
+/**
+ * Shows term `select` form field on job listing forms.
+ *
+ * This template can be overridden by copying it to yourtheme/job_manager/form-fields/term-select-field.php.
+ *
+ * @see         https://wpjobmanager.com/document/template-overrides/
+ * @author      Automattic
+ * @package     WP Job Manager
+ * @category    Template
+ * @version     1.27.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 // Get selected value
 if ( isset( $field['value'] ) ) {
@@ -16,14 +31,14 @@ if ( is_array( $selected ) ) {
 	$selected = current( $selected );
 }
 
-wp_dropdown_categories( array( 
+wp_dropdown_categories( apply_filters( 'job_manager_term_select_field_wp_dropdown_categories_args', array(
 	'taxonomy'         => $field['taxonomy'],
-	'hierarchical'     => 1, 
+	'hierarchical'     => 1,
 	'show_option_all'  => false,
 	'show_option_none' => $field['required'] ? '' : '-',
-	'name'             => isset( $field['name'] ) ? $field['name'] : $key, 
-	'orderby'          => 'name', 
+	'name'             => isset( $field['name'] ) ? $field['name'] : $key,
+	'orderby'          => 'name',
 	'selected'         => $selected,
 	'hide_empty'       => false
-) );
+), $key, $field ) );
 if ( ! empty( $field['description'] ) ) : ?><small class="description"><?php echo $field['description']; ?></small><?php endif; ?>

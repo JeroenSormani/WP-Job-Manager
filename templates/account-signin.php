@@ -1,3 +1,20 @@
+<?php
+/**
+ * In job listing creation flow, this template shows above the job creation form.
+ *
+ * This template can be overridden by copying it to yourtheme/job_manager/account-signin.php.
+ *
+ * @see         https://wpjobmanager.com/document/template-overrides/
+ * @author      Automattic
+ * @package     WP Job Manager
+ * @category    Template
+ * @version     1.27.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+?>
 <?php if ( is_user_logged_in() ) : ?>
 
 	<fieldset>
@@ -13,9 +30,9 @@
 	</fieldset>
 
 <?php else :
-
-	$account_required     = job_manager_user_requires_account();
-	$registration_enabled = job_manager_enable_registration();
+	$account_required      = job_manager_user_requires_account();
+	$registration_enabled  = job_manager_enable_registration();
+	$registration_fields   = wpjm_get_registration_fields();
 	?>
 	<fieldset>
 		<label><?php _e( 'Have an account?', 'wp-job-manager' ); ?></label>
@@ -24,7 +41,7 @@
 
 			<?php if ( $registration_enabled ) : ?>
 
-				<?php printf( __( 'If you don&rsquo;t have an account you can %screate one below by entering your email address. A password will be automatically emailed to you.', 'wp-job-manager' ), $account_required ? '' : __( 'optionally', 'wp-job-manager' ) . ' ' ); ?>
+				<?php printf( __( 'If you don&rsquo;t have an account you can %screate one below by entering your email address/username. Your account details will be confirmed via email.', 'wp-job-manager' ), $account_required ? '' : __( 'optionally', 'wp-job-manager' ) . ' ' ); ?>
 
 			<?php elseif ( $account_required ) : ?>
 
@@ -33,14 +50,20 @@
 			<?php endif; ?>
 		</div>
 	</fieldset>
-	<?php if ( $registration_enabled ) : ?>
-		<fieldset>
-			<label><?php _e( 'Your email', 'wp-job-manager' ); ?> <?php if ( ! $account_required ) echo '<small>' . __( '(optional)', 'wp-job-manager' ) . '</small>'; ?></label>
-			<div class="field">
-				<input type="email" class="input-text" name="create_account_email" id="account_email" placeholder="<?php esc_attr_e( 'you@yourdomain.com', 'wp-job-manager' ); ?>" value="<?php if ( ! empty( $_POST['create_account_email'] ) ) echo sanitize_text_field( stripslashes( $_POST['create_account_email'] ) ); ?>" />
-			</div>
-		</fieldset>
-		<?php do_action( 'job_manager_register_form' ); ?>
-	<?php endif; ?>
-
+	<?php
+	if ( ! empty( $registration_fields ) ) {
+		foreach ( $registration_fields as $key => $field ) {
+			?>
+			<fieldset class="fieldset-<?php echo esc_attr( $key ); ?>">
+				<label
+					for="<?php echo esc_attr( $key ); ?>"><?php echo $field[ 'label' ] . apply_filters( 'submit_job_form_required_label', $field[ 'required' ] ? '' : ' <small>' . __( '(optional)', 'wp-job-manager' ) . '</small>', $field ); ?></label>
+				<div class="field <?php echo $field[ 'required' ] ? 'required-field' : ''; ?>">
+					<?php get_job_manager_template( 'form-fields/' . $field[ 'type' ] . '-field.php', array( 'key'   => $key, 'field' => $field ) ); ?>
+				</div>
+			</fieldset>
+			<?php
+		}
+		do_action( 'job_manager_register_form' );
+	}
+	?>
 <?php endif; ?>
